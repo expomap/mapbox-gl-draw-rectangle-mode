@@ -7,7 +7,8 @@
   	"repository": "https://github.com/expomap/mapbox-gl-draw-rectangle-mode",
   	"type": "module",
   	"scripts": {
-  	  	"build": "rollup -c"
+  	  	"build": "rollup -c",
+		"lint": "npx eslint ."
   	},
   	"devDependencies": {
   	  	"@babel/cli": "^7.25.6",
@@ -16,6 +17,7 @@
   	  	"@rollup/plugin-babel": "^6.0.4",
   	  	"@rollup/plugin-commonjs": "^26.0.1",
   	  	"@rollup/plugin-node-resolve": "^15.2.3",
+  	  	"eslint": "^9.10.0",
   	  	"rollup": "^4.21.2"
   	}
 }
