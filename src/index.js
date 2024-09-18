@@ -1,8 +1,6 @@
-import doubleClickZoom from "./doubleClickZoom";
-import { findFourthPoint, findThirdPoint } from "./geometry/rectangleCompleter";
+import { doubleClickZoom, isEnterKey, isEscapeKey } from "./modeConsts";
 
 const DrawRectangle = {
-	
   	// When the mode starts this function will be called.
   	onSetup: function () {
   	  	const rectangle = this.newFeature({
@@ -21,7 +19,7 @@ const DrawRectangle = {
   	  	
 		this.updateUIClasses({ mouse: "add" });
   	  	this.setActionableState({trash: true});
-  	  	
+
 		return {
   	  	  	rectangle,
   	  	};
@@ -41,7 +39,6 @@ const DrawRectangle = {
   	onClick: function (state, e) {
   	  	// if state.startPoint exist, means its second click
   	  	//change to  simple_select mode
-  	  	
 		if (
   	    	state.startPoint &&
   	    	state.startPoint[0] !== e.lngLat.lng &&
@@ -62,14 +59,12 @@ const DrawRectangle = {
   	  	// we are simply using the startingPoint coordinates and the current Mouse Position
   	  	// coordinates to calculate the bounding box on the fly, which will be our rectangle
   	  	if (state.startPoint) {
-			const bearing = state.rectangle.ctx.map.getBearing() * -1;
-			
-			const firstPoint = {x: state.startPoint[0], y: state.startPoint[1]};
-			const secondPoint = {x: e.lngLat.lng, y: e.lngLat.lat};
-			
-			const thirdPoint = findThirdPoint(firstPoint, secondPoint, bearing);
-			const forthPoint = findFourthPoint(firstPoint, secondPoint, thirdPoint);
-			
+			const startPointInPx = state.rectangle.ctx.map.project([state.startPoint[0], state.startPoint[1]]);
+			const currentPointInPx = state.rectangle.ctx.map.project([e.lngLat.lng,e.lngLat.lat]);
+
+			const pontoDireita = state.rectangle.ctx.map.unproject([currentPointInPx.x, startPointInPx.y]);
+			const pontoBaixo = state.rectangle.ctx.map.unproject([startPointInPx.x, currentPointInPx.y]);
+
 			state.rectangle.updateCoordinate(
   	  	    	"0.0",
   	  	    	state.startPoint[0],
@@ -78,19 +73,20 @@ const DrawRectangle = {
   	  	  
 			state.rectangle.updateCoordinate(
   	  	    	"0.1",
-				thirdPoint.x,
-				thirdPoint.y
+				pontoDireita.lng,
+				pontoDireita.lat
   	  	  	); // maxX, minY
   	  	  	
 			state.rectangle.updateCoordinate(
 				"0.2",
-				e.lngLat.lng, e.lngLat.lat
+				e.lngLat.lng, 
+				e.lngLat.lat
 			); // maxX, maxY
   	  	  
 			state.rectangle.updateCoordinate(
   	  	    	"0.3",	
-  	  	    	forthPoint.x,
-				forthPoint.y
+				pontoBaixo.lng,
+				pontoBaixo.lat
   	  	  	); // minX,maxY
   	  	  
 			state.rectangle.updateCoordinate(
@@ -103,9 +99,13 @@ const DrawRectangle = {
   
 	// Whenever a user clicks on a key while focused on the map, it will be sent here
   	onKeyUp: function (state, e) {
-    	if (e.keyCode === 27){
+    	if (isEscapeKey(e)){
+            this.deleteFeature([state.rectangle.id], { silent: true });
 			return this.changeMode("simple_select");
 		} 
+		if (isEnterKey(e)){
+			return this.changeMode("simple_select");
+		}
   	},
   
 	onStop: function (state) {
@@ -149,7 +149,7 @@ const DrawRectangle = {
   	onTrash: function (state) {
   	  	this.deleteFeature([state.rectangle.id], { silent: true });
   	  	this.changeMode("simple_select");
-  	},
+  	}
 };
 
 export default DrawRectangle;

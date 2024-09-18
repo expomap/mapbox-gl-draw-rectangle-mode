@@ -1,6 +1,6 @@
 {
   	"name": "@expomap/mapbox-gl-draw-rectangle-mode",
-  	"version": "1.0.1",
+  	"version": "1.0.2",
   	"description": "Modo personalizado para o Mapbox GL Draw que adiciona a funcionalidade de desenhar retângulos",
   	"main": "dist/index.js",
   	"license": "MIT",
@@ -25,6 +25,7 @@
   	  	"@rollup/plugin-commonjs": "^26.0.1",
   	  	"@rollup/plugin-node-resolve": "^15.2.3",
   	  	"eslint": "^9.10.0",
-  	  	"rollup": "^4.21.2"
+  	  	"rollup": "^4.21.2",
+		"globals": "^15.9.0"
   	}
 }
